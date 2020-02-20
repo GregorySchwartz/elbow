@@ -10,7 +10,7 @@ module Math.Elbow
   ( findElbow
   , findElbowList
   , getRotationAngle
-  , MaxMin (..)
+  , MinMax (..)
   ) where
 
 -- Remote
@@ -20,7 +20,7 @@ import qualified Numeric.LinearAlgebra as H
 -- Local
 
 
-data MaxMin = Max | Min
+data MinMax = Min | Max deriving (Read, Show)
 
 -- | Convert a list to a tuple.
 listToTuple :: [a] -> Maybe (a, a)
@@ -41,18 +41,18 @@ getRotationAngle = fmap (uncurry atan2)
 -- (for positive x and y, top left hump would be Max, bottom right dip would be
 -- Min). Matrix rows are observations, columns are dimensions.
 findElbow :: (RealFloat a, H.Numeric a)
-          => MaxMin -> H.Matrix a -> Maybe (Int, (a, a))
-findElbow maxMin m = do
+          => MinMax -> H.Matrix a -> Maybe (Int, (a, a))
+findElbow minMax m = do
   theta <- getRotationAngle m
 
   let co = cos theta
       si = sin theta
       rot = (2 H.>< 2) [co, -si, si, co]
       rotated = m H.<> rot
-      findMaxMin Max = H.maxIndex
-      findMaxMin Min = H.minIndex
+      findMinMax Max = H.maxIndex
+      findMinMax Min = H.minIndex
 
-  idx <- fmap (findMaxMin maxMin) . flip atMay 1 . H.toColumns $ rotated
+  idx <- fmap (findMinMax minMax) . flip atMay 1 . H.toColumns $ rotated
 
   fmap (idx,) . listToTuple . H.toList $ m H.! idx
 
@@ -61,5 +61,5 @@ findElbow maxMin m = do
 -- (for positive x and y, top left hump would be Max, bottom right dip would be
 -- Min). Matrix rows are observations, columns are dimensions. List of columns.
 findElbowList :: (RealFloat a, H.Numeric a)
-              => MaxMin -> [[a]] -> Maybe (Int, (a, a))
-findElbowList maxMin = findElbow maxMin . H.fromColumns . fmap H.fromList
+              => MinMax -> [[a]] -> Maybe (Int, (a, a))
+findElbowList minMax = findElbow minMax . H.fromColumns . fmap H.fromList

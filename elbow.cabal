@@ -1,5 +1,5 @@
 name:                elbow
-version:             0.1.0.0
+version:             0.1.1.0
 synopsis:            Find the elbow point.
 description:         Use rotations to identify the elbow point of a two-dimensional long-tailed distribution.
 homepage:            http://github.com/GregorySchwartz/elbow#readme

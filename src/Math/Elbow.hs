@@ -8,6 +8,8 @@ Collects the functions pertaining to the blah.
 
 module Math.Elbow
   ( findElbow
+  , findElbowList
+  , getRotationAngle
   ) where
 
 -- Remote
@@ -44,3 +46,8 @@ findElbow m = do
   idx <- fmap H.minIndex . flip atMay 1 . H.toColumns $ rotated
 
   fmap (idx,) . listToTuple . H.toList $ m H.! idx
+
+-- | Get the elbow point (and its index) of a two-dimensional distribution.
+-- Matrix rows are observations, columns are dimensions. List of columns.
+findElbowList :: (RealFloat a, H.Numeric a) => [[a]] -> Maybe (Int, (a, a))
+findElbowList = findElbow . H.fromColumns . fmap H.fromList
